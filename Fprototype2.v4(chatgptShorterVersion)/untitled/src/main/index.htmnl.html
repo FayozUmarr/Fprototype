@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather App</title>
+</head>
+<body>
+<h1>Weather App</h1>
+<input type="text" id="cityInput" placeholder="Enter city">
+<button onclick="fetchWeather()">Get Weather</button>
+<div id="weatherInfo"></div>
+
+<script>
+    function fetchWeather() {
+        var city = document.getElementById("cityInput").value;
+        if (city.trim() !== "") {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "http://localhost:8080/WeatherApp/WeatherDataJSON", true); // URL of your Java program
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        var weatherData = JSON.parse(xhr.responseText);
+                        displayWeather(weatherData);
+                    } else {
+                        document.getElementById("weatherInfo").innerHTML = "Error fetching weather data.";
+                    }
+                }
+            };
+            var data = JSON.stringify({ city: city });
+            xhr.send(data);
+        } else {
+            document.getElementById("weatherInfo").innerHTML = "Please enter a city name.";
+        }
+    }
+
+    function displayWeather(weatherData) {
+        if (weatherData.length > 0) {
+            var weatherInfo = "";
+            for (var i = 0; i < weatherData.length; i++) {
+                weatherInfo += "<h3>City: " + weatherData[i].city + "</h3>";
+                weatherInfo += "<p>Temperature: " + weatherData[i].temperature + "°C</p>";
+                weatherInfo += "<p>Humidity: " + weatherData[i].humidity + "%</p>";
+                weatherInfo += "<hr>";
+            }
+            document.getElementById("weatherInfo").innerHTML = weatherInfo;
+        } else {
+            document.getElementById("weatherInfo").innerHTML = "No weather data found.";
+        }
+    }
+</script>
+</body>
+</html>
